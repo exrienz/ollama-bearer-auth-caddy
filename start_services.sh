@@ -1,12 +1,54 @@
 #!/bin/bash
 
-# If Caddyfile doesn’t exist yet in persistent volume, copy from image
+# Create /etc/caddy/ if not exist
+mkdir -p /etc/caddy
+
+# Create Caddyfile if not exists
 if [ ! -f /etc/caddy/Caddyfile ]; then
-  cp /Caddy/Caddyfile /etc/caddy/Caddyfile
+  cat << 'EOF' > /etc/caddy/Caddyfile
+{
+    # Enable logging
+    log {
+        output file /var/log/caddy/access.log {
+            roll_size 5mb
+            roll_keep 2
+            roll_keep_for 720h
+        }
+        format json
+    }
+}
+
+:8081 {
+    # Forward authentication to the Python script
+    forward_auth /* localhost:9090 {
+        uri /validate
+        copy_headers Authorization
+        copy_headers Proxy-Status
+    }
+
+    @apiAuth {
+        header Proxy-Status valid_api_key
+    }
+
+    # Proxy authorized requests
+    reverse_proxy @apiAuth http://localhost:11434
+
+    # Define a matcher for unauthorized access
+    @unauthorized {
+        header Proxy-Status invalid_api_key
+    }
+
+    # Handle errors
+    handle_errors {
+        respond "Bad Gateway" 502
+    }
+}
+EOF
 fi
 
+# Create valid_keys.conf if not exists
 if [ ! -f /etc/caddy/valid_keys.conf ]; then
-  cp /Caddy/valid_keys.conf /etc/caddy/valid_keys.conf
+  echo "sk-ollama-key1" > /etc/caddy/valid_keys.conf
 fi
 
 # Define log file
