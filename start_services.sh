@@ -22,6 +22,15 @@ caddy run --config /etc/caddy/Caddyfile &
 CADDY_PID=$!
 echo "$(date): Started Caddy with PID $CADDY_PID" >> "$LOG_FILE"
 
+# If Caddyfile doesn’t exist yet in persistent volume, copy from image
+if [ ! -f /etc/caddy/Caddyfile ]; then
+  cp /app/defaults/Caddyfile /etc/caddy/Caddyfile
+fi
+
+if [ ! -f /etc/caddy/valid_keys.conf ]; then
+  cp /app/defaults/valid_keys.conf /etc/caddy/valid_keys.conf
+fi
+
 # Start Uvicorn with FastAPI app
 uvicorn app.main:app --host 0.0.0.0 --port 9090 &
 UVICORN_PID=$!
