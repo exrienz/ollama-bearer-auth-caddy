@@ -1,5 +1,14 @@
 #!/bin/bash
 
+# If Caddyfile doesn’t exist yet in persistent volume, copy from image
+if [ ! -f /etc/caddy/Caddyfile ]; then
+  cp /Caddy/Caddyfile /etc/caddy/Caddyfile
+fi
+
+if [ ! -f /etc/caddy/valid_keys.conf ]; then
+  cp /Caddy/valid_keys.conf /etc/caddy/valid_keys.conf
+fi
+
 # Define log file
 LOG_FILE="/var/log/service_monitor.log"
 
@@ -17,14 +26,6 @@ ollama serve &
 OLLAMA_PID=$!
 echo "$(date): Started Ollama with PID $OLLAMA_PID" >> "$LOG_FILE"
 
-# If Caddyfile doesn’t exist yet in persistent volume, copy from image
-if [ ! -f /etc/caddy/Caddyfile ]; then
-  cp /Caddy/Caddyfile /etc/caddy/Caddyfile
-fi
-
-if [ ! -f /etc/caddy/valid_keys.conf ]; then
-  cp /Caddy/valid_keys.conf /etc/caddy/valid_keys.conf
-fi
 
 # Start Caddy in the background
 caddy run --config /etc/caddy/Caddyfile &
