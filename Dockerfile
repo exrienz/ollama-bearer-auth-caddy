@@ -1,4 +1,4 @@
-# Stage 1: Base Image with CUDA
+# Stage 1: Base Image with CUDA.
 FROM nvidia/cuda:12.5.0-runtime-ubuntu22.04 AS base
 
 # Install dependencies including Python and Pip
