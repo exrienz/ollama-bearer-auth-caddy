@@ -3,7 +3,7 @@ name: Build & Push ollama-api to DockerHub
 on:
   push:
     branches:
-      - master
+      - main
 
 jobs:
   build-and-push:
