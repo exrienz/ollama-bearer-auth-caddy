@@ -19,11 +19,11 @@ echo "$(date): Started Ollama with PID $OLLAMA_PID" >> "$LOG_FILE"
 
 # If Caddyfile doesn’t exist yet in persistent volume, copy from image
 if [ ! -f /etc/caddy/Caddyfile ]; then
-  cp /app/defaults/Caddyfile /etc/caddy/Caddyfile
+  cp /Caddy/Caddyfile /etc/caddy/Caddyfile
 fi
 
 if [ ! -f /etc/caddy/valid_keys.conf ]; then
-  cp /app/defaults/valid_keys.conf /etc/caddy/valid_keys.conf
+  cp /Caddy/valid_keys.conf /etc/caddy/valid_keys.conf
 fi
 
 # Start Caddy in the background
